@@ -1,0 +1,44 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // Adjust address if needed
+
+String staticLine = "Good Morning";
+String messages[] = {
+  "Hello World!",
+  "Welcome Back!",
+  "Enjoy Your Day!",
+  "Stay Creative!"
+};
+
+const int numMessages = sizeof(messages) / sizeof(messages[0]);
+int currentMessage = 0;
+unsigned long lastSwitch = 0;
+const unsigned long switchInterval = 3000; // Switch every 3 seconds
+
+void setup() {
+  lcd.init();
+  lcd.backlight();
+
+  lcd.setCursor(0, 0);
+  lcd.print(staticLine);
+  lcd.setCursor(0, 1);
+  lcd.print(messages[currentMessage]);
+}
+
+void loop() {
+  unsigned long now = millis();
+  if (now - lastSwitch >= switchInterval) {
+    currentMessage++;
+    if (currentMessage >= numMessages) {
+      currentMessage = 0;
+    }
+
+    lcd.setCursor(0, 1);
+    lcd.print("                ");  // Clear line
+    lcd.setCursor(0, 1);
+    lcd.print(messages[currentMessage]);
+
+    lastSwitch = now;
+  }
+}
