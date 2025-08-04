@@ -1,0 +1,48 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // Adjust address if needed
+
+String staticLine = "Good Morning";
+String messages[] = {
+  "    Hello World!    ",
+  "    Welcome Back!   ",
+  "    Enjoy Your Day! ",
+  "    Stay Creative!  "
+};
+
+const int numMessages = sizeof(messages) / sizeof(messages[0]);
+int currentMessage = 0;
+int scrollIndex = 0;
+
+void setup() {
+  lcd.init();
+  lcd.backlight();
+
+  lcd.setCursor(0, 0);
+  lcd.print(staticLine);
+}
+
+void loop() {
+  String scrollText = messages[currentMessage];
+
+  // Scroll 1 frame
+  for (int i = 0; i < 16; i++) {
+    char c = scrollText.charAt(scrollIndex + i);
+    lcd.setCursor(i, 1);
+    lcd.write(c);
+  }
+
+  scrollIndex++;
+
+  // Finished scrolling one full message
+  if (scrollIndex > scrollText.length() - 16) {
+    scrollIndex = 0;
+    currentMessage++;
+    if (currentMessage >= numMessages) {
+      currentMessage = 0;  // Loop back to first message
+    }
+  }
+
+  delay(1000); // Scroll speed (can tweak)
+}
